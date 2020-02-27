@@ -2,6 +2,8 @@
 
 namespace App\Validation\Rules;
 
+use App\Validation\Validator;
+
 class RequiredWithRule extends Rule
 {
 
@@ -34,6 +36,9 @@ class RequiredWithRule extends Rule
      */
     public function message($field)
     {
-        return $field . ' is required with '. implode(', ', $this->fields);
+
+        $aliases = Validator::getAliases($this->fields);
+
+        return $field . ' is required with '.  strtolower(implode(', ', $aliases));
     }
 }

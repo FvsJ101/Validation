@@ -26,7 +26,7 @@ class Validator
     /**
      * @var array
      */
-    protected $aliases;
+    protected static $aliases;
 
     public function __construct()
     {
@@ -109,7 +109,7 @@ class Validator
         if (!$rule->passes($field, $this->getFieldValue($field, $this->data), $this->data)){
             $this->errors->addError(
                 $field,
-                $rule->message($this->getAlias($field))
+                $rule->message(self::getAlias($field))
             );
         }
     }
@@ -118,9 +118,22 @@ class Validator
      * @param $field
      * @return mixed
      */
-    protected function getAlias($field)
+    public static function getAlias($field)
     {
-        return $this->aliases[$field] ?? $field;
+        return self::$aliases[$field] ?? $field;
+    }
+
+    /**
+     * @param array $fields
+     * @return mixed
+     */
+    public static function getAliases(array $fields)
+    {
+
+        return array_map(function ($field) {
+            return self::getAlias($field);
+        }, $fields);
+
     }
 
     /**
@@ -146,7 +159,7 @@ class Validator
      */
     public function setAliases(array $aliases)
     {
-        $this->aliases = $aliases;
+        self::$aliases = $aliases;
     }
 
     /**

@@ -9,17 +9,22 @@ $validator = new Validator();
 $result = $validator->validate(
     [
         "first_name" => '',
-        "last_name" => 'Mike',
+        "middle_name" => '',
+        "last_name" => '',
         "email" => '',
     ],
     [
         'first_name' => [
             'required',
             'between:2,5',
-            'required_with:last_name',
+            'required_with:last_name,middle_name',
         ],
 
         'last_name' => [
+            'required'
+        ],
+
+        'middle_name' => [
             'required'
         ],
 
@@ -30,6 +35,8 @@ $result = $validator->validate(
     ],
     [
         'first_name' => 'First name',
+        'last_name' => 'Last name',
+        'middle_name' => 'Middle name',
         'email' => 'Email address',
     ]
 );
