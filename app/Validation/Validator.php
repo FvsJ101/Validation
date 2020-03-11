@@ -3,6 +3,7 @@
 namespace App\Validation;
 
 use App\Validation\Errors\ErrorBag;
+use App\Validation\Rules\OptionalRule;
 use App\Validation\Rules\Rule;
 
 class Validator
@@ -45,13 +46,31 @@ class Validator
         $this->setRules($rules);
         $this->setAliases($aliases);
 
+
         foreach ($this->rules as $field => $rules) {
-            foreach ($this->resolveRules($rules) as $rule) {
-                $this->validateRule($field, $rule);
+            $resolvedRules = $this->resolveRules($rules);
+
+            foreach ($resolvedRules as $rule) {
+
+                $this->validateRule($field, $rule, $this->resolvedRulesContainsOptional($resolvedRules));
             }
         }
 
         return $this->errors->hasErrors();
+    }
+
+    protected function resolvedRulesContainsOptional(array $rules)
+    {
+
+        foreach ($rules as $rule) {
+
+            if ($rule instanceOf OptionalRule) {
+                return true;
+            }
+
+        }
+
+        return false;
     }
 
     /**
@@ -100,11 +119,18 @@ class Validator
     /**
      * @param $field
      * @param Rule $rule
+     * @param bool $optional
      */
-    protected function validateRule($field, Rule $rule)
+    protected function validateRule($field, Rule $rule, $optional = false)
     {
+
         foreach ($this->getMatchingData($field) as $matchedField) {
-            $this->validateUsingRuleObject($matchedField, $this->getFieldValue($matchedField, $this->data), $rule);
+
+            if ($value = $this->getFieldValue($matchedField, $this->data) === '' || $optional) {
+                continue;
+            }
+
+            $this->validateUsingRuleObject($matchedField, $value, $rule);
         }
     }
 

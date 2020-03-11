@@ -8,6 +8,9 @@ $validator = new Validator();
 
 $result = $validator->validate(
     [
+
+        'email' => 'mike'
+
         /*"first_name"  => 'mike',
         "middle_name" => 'mike',
         "last_name"   => 'meyer',*/
@@ -17,13 +20,18 @@ $result = $validator->validate(
             '',
         ],*/
 
-        "users"       => [
+       /* "users"       => [
             ['email' => 'testing@test.com', 'first_name' => 'mike'],
             ['email' => 'testing', 'first_name' => 'dale'],
             ['email' => '', 'first_name' => 'ash'],
-        ],
+        ],*/
     ],
     [
+
+        'email' => [
+            'optional','email'
+        ],
+
         /*'first_name' => [
             'required',
             'between:2,5',
@@ -38,13 +46,13 @@ $result = $validator->validate(
             'required'
         ],*/
 
-        'users.*.email' => [
+        /*'users.*.email' => [
             'required',
             'email'
         ],
         'users.*.first_name' => [
             'required',
-        ],
+        ],*/
     ],
     [
         /*'first_name'  => 'First name',
