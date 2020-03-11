@@ -42,6 +42,9 @@ $result = $validator->validate(
             'required',
             'email'
         ],
+        'users.*.first_name' => [
+            'required',
+        ],
     ],
     [
         /*'first_name'  => 'First name',

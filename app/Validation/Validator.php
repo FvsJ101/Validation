@@ -103,12 +103,33 @@ class Validator
      */
     protected function validateRule($field, Rule $rule)
     {
-        if (!$rule->passes($field, $this->getFieldValue($field, $this->data), $this->data)) {
+        foreach ($this->getMatchingData($field) as $matchedField) {
+            $this->validateUsingRuleObject($matchedField, $this->getFieldValue($matchedField, $this->data), $rule);
+        }
+    }
+
+    /**
+     * @param $field
+     * @param $value
+     * @param Rule $rule
+     */
+    protected function validateUsingRuleObject($field, $value, Rule $rule)
+    {
+        if (!$rule->passes($field, $value, $this->data)) {
             $this->errors->addError(
                 $field,
                 $rule->message(self::getAlias($field))
             );
         }
+    }
+
+    /**
+     * @param $field
+     * @return array
+     */
+    protected function getMatchingData($field)
+    {
+        return preg_grep('/^' . str_replace('*', '([^\.]+)', $field) . '/', array_keys($this->data));
     }
 
     /**

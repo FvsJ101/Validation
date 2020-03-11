@@ -20,7 +20,7 @@ class ErrorBag
      */
     public function getErrors(): array
     {
-        return $this->errors;
+        return array_reverse($this->errors);
     }
 
     /**
