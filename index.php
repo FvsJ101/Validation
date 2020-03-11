@@ -8,13 +8,23 @@ $validator = new Validator();
 
 $result = $validator->validate(
     [
-        "first_name" => '',
-        "middle_name" => '',
-        "last_name" => '',
-        "email" => '',
+        /*"first_name"  => 'mike',
+        "middle_name" => 'mike',
+        "last_name"   => 'meyer',*/
+        /*"emails"       => [
+            'testing@test.com',
+            'testing',
+            '',
+        ],*/
+
+        "users"       => [
+            ['email' => 'testing@test.com', 'first_name' => 'mike'],
+            ['email' => 'testing', 'first_name' => 'dale'],
+            ['email' => '', 'first_name' => 'ash'],
+        ],
     ],
     [
-        'first_name' => [
+        /*'first_name' => [
             'required',
             'between:2,5',
             'required_with:last_name,middle_name',
@@ -26,26 +36,25 @@ $result = $validator->validate(
 
         'middle_name' => [
             'required'
-        ],
+        ],*/
 
-        'email' => [
+        'users.*.email' => [
             'required',
             'email'
         ],
     ],
     [
-        'first_name' => 'First name',
-        'last_name' => 'Last name',
-        'middle_name' => 'Middle name',
-        'email' => 'Email address',
+        /*'first_name'  => 'First name',
+        'last_name'   => 'Last name',
+        'middle_name' => 'Middle name',*/
+        'email'       => 'Email address',
     ]
 );
 
 if (!$result) {
-    dump($validator->getErrors());
-
-}else {
-    dump($result);
+    dump("failed", $validator->getErrors());
+} else {
+    dump("passed", $result);
 }
 
 

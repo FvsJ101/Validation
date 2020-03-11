@@ -41,7 +41,7 @@ class Validator
      */
     public function validate(array $data, array $rules, array $aliases)
     {
-        $this->setData($data);
+        $this->setData($this->extractWildCardData($data));
         $this->setRules($rules);
         $this->setAliases($aliases);
 
@@ -60,19 +60,19 @@ class Validator
      */
     protected function resolveRules(array $rules)
     {
+        return array_map(
+            function ($rule) {
+                #TODO refactor
+                //return (is_string($rule))? $this->getRuleFromString($rule) : $rule;
 
-        return array_map(function ($rule) {
+                if (is_string($rule)) {
+                    return $this->getRuleFromString($rule);
+                }
 
-            #TODO refactor
-            //return (is_string($rule))? $this->getRuleFromString($rule) : $rule;
-
-            if (is_string($rule)) {
-                return $this->getRuleFromString($rule);
-            }
-
-            return $rule;
-        }, $rules);
-
+                return $rule;
+            },
+            $rules
+        );
     }
 
     /**
@@ -81,12 +81,10 @@ class Validator
      */
     protected function getRuleFromString($rule)
     {
-
         return $this->newRuleFromMap(
             ($exploded = explode(':', $rule))[0],
             explode(',', end($exploded))
         );
-
     }
 
     /**
@@ -105,13 +103,31 @@ class Validator
      */
     protected function validateRule($field, Rule $rule)
     {
-
-        if (!$rule->passes($field, $this->getFieldValue($field, $this->data), $this->data)){
+        if (!$rule->passes($field, $this->getFieldValue($field, $this->data), $this->data)) {
             $this->errors->addError(
                 $field,
                 $rule->message(self::getAlias($field))
             );
         }
+    }
+
+    /**
+     * @param array $array
+     * @param string $root
+     * @param array $results
+     * @return array
+     */
+    protected function extractWildCardData(array $array, $root = '', $results = [])
+    {
+        foreach ($array as $key => $value) {
+            if (is_iterable($value)) {
+                $results = array_merge($results, $this->extractWildCardData($value, $root . $key . '.'));
+            } else {
+                $results[$root . $key] = $value;
+            }
+        }
+
+        return $results;
     }
 
     /**
@@ -129,11 +145,12 @@ class Validator
      */
     public static function getAliases(array $fields)
     {
-
-        return array_map(function ($field) {
-            return self::getAlias($field);
-        }, $fields);
-
+        return array_map(
+            function ($field) {
+                return self::getAlias($field);
+            },
+            $fields
+        );
     }
 
     /**
